@@ -10,7 +10,7 @@ users = {}
 def create_user_service(user: UserCreate) -> UserOut:
     user_out = UserOut(name=user.name)
 
-    users[user_out.id] = user_out
+    users[str(user_out.id)] = user_out
 
     return user_out
 
@@ -20,7 +20,7 @@ def get_users_service() -> List[UserOut]:
 
 
 def get_user_service(user_id: uuid.UUID) -> UserOut:
-    user = users.get(user_id)
+    user = users.get(str(user_id))
 
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='User was not found')
@@ -29,9 +29,10 @@ def get_user_service(user_id: uuid.UUID) -> UserOut:
 
 
 def delete_user_service(user_id: uuid.UUID) -> None:
-    if user_id not in users:
+    user_id_str = str(user_id)
+    if user_id_str not in users:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='User was not found')
 
-    del users[user_id]
+    del users[user_id_str]
 
     return
