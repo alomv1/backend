@@ -18,6 +18,6 @@ def get_categories():
     return get_categories_service()
 
 
-@router.delete("/category", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/category/{category_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_category(category_id):
     delete_category_service(category_id)

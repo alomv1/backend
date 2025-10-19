@@ -6,7 +6,7 @@ categories = {}
 
 def create_category_service(category: CategoryCreate) -> CategoryOut:
     category_out = CategoryOut(name=category.name)
-    categories[category_out.id] = category_out
+    categories[str(category_out.id)] = category_out
     return category_out
 
 def get_categories_service() -> List[CategoryOut]:
