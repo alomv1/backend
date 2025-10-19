@@ -1,13 +1,13 @@
 import uuid
 
 from fastapi import status, HTTPException
-
+from typing import List
 from schemas.user import UserOut, UserCreate
 
 users = {}
 
 
-def create_user_service(user: UserCreate):
+def create_user_service(user: UserCreate) -> UserOut:
     user_out = UserOut(name=user.name)
 
     users[user_out.id] = user_out
@@ -15,11 +15,11 @@ def create_user_service(user: UserCreate):
     return user_out
 
 
-def get_users_service():
+def get_users_service() -> List[UserOut]:
     return list(users.values())
 
 
-def get_user_service(user_id: uuid.UUID):
+def get_user_service(user_id: uuid.UUID) -> UserOut:
     user = users.get(user_id)
 
     if not user:
@@ -28,7 +28,7 @@ def get_user_service(user_id: uuid.UUID):
     return user
 
 
-def delete_user_service(user_id: uuid.UUID):
+def delete_user_service(user_id: uuid.UUID) -> None:
     if user_id not in users:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='User was not found')
 
