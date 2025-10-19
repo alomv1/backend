@@ -7,12 +7,12 @@ records = {}
 
 def create_record_service(record: RecordCreate) -> RecordOut:
     record_out = RecordOut(**record.model_dump())
-    records[record_out.id] = record_out
+    records[str(record_out.id)] = record_out
     return record_out
 
 
 def get_record_service(record_id: str) -> RecordOut:
-    record = records.get(record_id)
+    record = records.get(str(record_id))
     if not record:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Record not found")
     return record
