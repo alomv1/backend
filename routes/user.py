@@ -1,3 +1,4 @@
+import uuid
 from typing import List
 
 from fastapi import APIRouter, status
@@ -15,7 +16,7 @@ def create_user(user: UserCreate):
 
 @router.get('/users', response_model=List[UserOut], status_code=status.HTTP_200_OK)
 def get_users():
-    return get_users_service
+    return get_users_service()
 
 
 @router.get('/user/{user_id}', response_model=UserOut, status_code=status.HTTP_200_OK)
@@ -23,6 +24,6 @@ def get_user(user_id):
     return get_user_service(user_id)
 
 
-@router.delete('/user/user_id', status_code=status.HTTP_204_NO_CONTENT)
+@router.delete('/user/{user_id}', status_code=status.HTTP_204_NO_CONTENT)
 def delete_user(user_id):
     return delete_user_service(user_id)
