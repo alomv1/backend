@@ -15,7 +15,7 @@ def create_record(record: RecordCreate):
 
 
 @router.get("/record", response_model=List[RecordOut], status_code=status.HTTP_200_OK)
-def get_records(user_id: Optional[str], category_id: Optional[str]):
+def get_records(user_id: Optional[str] = None, category_id: Optional[str] = None):
     return get_records_service(user_id=user_id, category_id=category_id)
 
 
