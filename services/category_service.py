@@ -1,19 +1,26 @@
-from fastapi import HTTPException, status
-from schemas.category import CategoryCreate, CategoryOut
+import uuid
 from typing import List
+from sqlalchemy.orm import Session
 
-categories = {}
+from models import Category
+from schemas.category import CategoryCreate
 
-def create_category_service(category: CategoryCreate) -> CategoryOut:
-    category_out = CategoryOut(name=category.name)
-    categories[str(category_out.id)] = category_out
-    return category_out
 
-def get_categories_service() -> List[CategoryOut]:
-    return list(categories.values())
+def create_category_service(category: CategoryCreate, db: Session) -> Category:
+    db_category = Category(name=category.name)
 
-def delete_category_service(category_id: str) -> None:
-    if category_id not in categories:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Category not found")
-    del categories[category_id]
-    return
+    db.add(db_category)
+    db.commit()
+    db.refresh(db_category)
+
+    return db_category
+
+
+def get_categories_service(db: Session) -> List[Category]:
+    return db.query(Category).all()
+
+
+def delete_category_service(category_id: uuid.UUID, db: Session) -> None:
+    category = db.query(Category).filter(Category.id == category_id).first()
+    db.delete(category)
+    db.commit()

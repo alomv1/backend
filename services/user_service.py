@@ -1,38 +1,45 @@
 import uuid
 
-from fastapi import status, HTTPException
-from typing import List
-from schemas.user import UserOut, UserCreate
+from sqlalchemy.orm import Session
+from fastapi import HTTPException, status
 
-users = {}
-
-
-def create_user_service(user: UserCreate) -> UserOut:
-    user_out = UserOut(name=user.name)
-
-    users[str(user_out.id)] = user_out
-
-    return user_out
+from models import User
+from schemas.user import UserCreate
 
 
-def get_users_service() -> List[UserOut]:
-    return list(users.values())
+def create_user_service(user: UserCreate, db: Session) -> User:
+    db_user = User(name=user.name)
+
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+
+    return db_user
 
 
-def get_user_service(user_id: uuid.UUID) -> UserOut:
-    user = users.get(str(user_id))
+def get_users_service(db: Session) -> list[type[User]]:
+    return db.query(User).all()
+
+
+def get_user_service(user_id: uuid.UUID, db: Session) -> User:
+    user = db.query(User).filter(User.id == user_id).first()
 
     if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='User was not found')
-
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User was not found"
+        )
     return user
 
 
-def delete_user_service(user_id: uuid.UUID) -> None:
-    user_id_str = str(user_id)
-    if user_id_str not in users:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='User was not found')
+def delete_user_service(user_id: uuid.UUID, db: Session) -> None:
+    user = db.query(User).filter(User.id == user_id).first()
 
-    del users[user_id_str]
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User was not found"
+        )
 
-    return
+    db.delete(user)
+    db.commit()
