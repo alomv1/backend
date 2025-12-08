@@ -1,8 +1,12 @@
-from pydantic import BaseModel, Field
-from uuid import uuid4
+from pydantic import BaseModel, Field, ConfigDict
+from uuid import UUID
+
 
 class CategoryCreate(BaseModel):
     name: str = Field(..., title="Category name", description="Enter category name")
 
+
 class CategoryOut(CategoryCreate):
-    id: str = Field(default_factory=uuid4)
+    id: UUID
+
+    model_config = ConfigDict(from_attributes=True)
