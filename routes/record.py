@@ -1,29 +1,23 @@
-from typing import List, Optional
+import uuid
+from typing import List
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, Depends
+from sqlalchemy.orm import Session
 
-from schemas.record import RecordCreate, RecordOut
-from services.record_service import create_record_service, get_record_service, get_records_service, \
-    delete_record_service
+from database import get_db
+from schemas.category import CategoryCreate, CategoryOut
+import services.category_service as category_service
 
 router = APIRouter()
 
+@router.post("/category", response_model=CategoryOut, status_code=status.HTTP_201_CREATED)
+def create_category(category: CategoryCreate, db: Session = Depends(get_db)):
+    return category_service.create_category_service(category, db)
 
-@router.post("/record", response_model=RecordOut, status_code=status.HTTP_201_CREATED)
-def create_record(record: RecordCreate):
-    return create_record_service(record)
+@router.get("/category", response_model=List[CategoryOut], status_code=status.HTTP_200_OK)
+def get_categories(db: Session = Depends(get_db)):
+    return category_service.get_categories_service(db)
 
-
-@router.get("/record", response_model=List[RecordOut], status_code=status.HTTP_200_OK)
-def get_records(user_id: Optional[str] = None, category_id: Optional[str] = None):
-    return get_records_service(user_id=user_id, category_id=category_id)
-
-
-@router.get("/record/{record_id}", response_model=RecordOut, status_code=status.HTTP_200_OK)
-def get_record(record_id: str):
-    return get_record_service(record_id)
-
-
-@router.delete("/record/{record_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_record(record_id: str):
-    delete_record_service(record_id)
+@router.delete("/category/{category_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_category(category_id: uuid.UUID, db: Session = Depends(get_db)):
+    category_service.delete_category_service(category_id, db)
