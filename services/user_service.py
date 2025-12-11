@@ -5,10 +5,23 @@ from fastapi import HTTPException, status
 
 from models import User
 from schemas.user import UserCreate
+from utils.security import get_password_hash
 
 
 def create_user_service(user: UserCreate, db: Session) -> User:
-    db_user = User(name=user.name)
+    existing_user = db.query(User).filter(User.name == user.name).first()
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Username already registered"
+        )
+
+    hashed_pwd = get_password_hash(user.password)
+
+    db_user = User(
+        name=user.name,
+        hashed_password=hashed_pwd
+    )
 
     db.add(db_user)
     db.commit()
