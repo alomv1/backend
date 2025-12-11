@@ -3,6 +3,7 @@ from uuid import UUID
 
 class UserCreate(BaseModel):
     name: str = Field(..., title='username', description='enter username:')
+    password: str = Field(..., min_length=5, description="User password")
 
 class UserOut(UserCreate):
     id: UUID
